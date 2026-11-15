@@ -1,6 +1,6 @@
 ---
 title: "BBD Metagenome: Binning"
-author: "Your Name"
+author: "Bryce Mazloum"
 date: "`r Sys.Date()`"
 output:
   github_document:
@@ -17,9 +17,28 @@ knitr::opts_hooks$set(engine = function(options) {
 })
 ```
 
+```{bash}
+cd ~/bbd-metagenome/metabat
+
+cat ../flye/bbd/assembly_info.txt  | grep -v '#' | awk '{OFS="\t";print $1,$3}' > depths_bbd.txt
+
+cat depths_bbd.txt | awk '{print $1}' | xargs samtools faidx ../flye/bbd/assembly.fasta > assembly_bbd_ordered.fasta
+
+
+```
+
+select metabat directory
+
+extracted depth information
+
+reordered contigs based on depth
+
+metabat run
 <!--
 Explain what this step does and why, and copy each command you ran into a
 bash chunk. R chunks run from the top of the repository.
 -->
+
+~~~
 
 Binning of the assembled contigs into genomes with MetaBAT 2. Commands for this step were run in `metabat/`.
