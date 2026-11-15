@@ -1,6 +1,6 @@
 ---
 title: "BBD Metagenome: Taxonomy"
-author: "Your Name"
+author: "Bryce Mazloum"
 date: "`r Sys.Date()`"
 output:
   github_document:
@@ -17,9 +17,50 @@ knitr::opts_hooks$set(engine = function(options) {
 })
 ```
 
-<!--
-Explain what this step does and why, and copy each command you ran into a
-bash chunk. R chunks run from the top of the repository.
--->
+```{slurm}
+cd ~/bbd-metagenome/gtdbtk
+
+while read bin;do echo $bin;done < ../checkm/bbd_topbins.txt
+
+while read bin;do echo "../metabat/bins_bbd/${bin}.fa";done < ../checkm/bbd_topbins.txt
+
+while read bin;do cp "../metabat/bins_bbd/${bin}.fa" genomes;done < ../checkm/bbd_topbins.txt
+
+ls genomes
+
+#!/bin/bash
+#SBATCH --time=120
+#SBATCH --cpus-per-task=2 --mem=56gb
+
+echo "Starting gtdbtk in $(pwd) at $(date)"
+
+shopt -s expand_aliases
+alias gtdbtk='apptainer run -B /pvol:/pvol,/pvol/data/mg/gtdbtkdata/release207_v2/:/refdata /pvol/data/sif/gtdbtk.sif'
+
+gtdbtk classify_wf -x fa --cpus 2 --genome_dir genomes --out_dir out --skip_ani_screen
+
+echo "Finished gtdbtk in $(pwd) at $(date)"
+# shell script
+
+sbatch run_gtdbtk.sh
+
+ls -l out/gtdbtk.bac120.summary.tsv
+
+cp out/gtdbtk.bac120.summary.tsv .
+
+```
+
+switch directory to gtdbtk
+
+create loop code to copy over topbins
+
+check that files sucessfully copied
+
+create new shell script for classifications
+
+check that shell script ran properly and create summary of classifications
+
+copy summary into gtdbtk folder
+~~~
 
 Taxonomic classification of the most complete bins with GTDB-Tk. Commands for this step were run in `gtdbtk/`.
