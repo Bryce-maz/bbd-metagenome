@@ -1,6 +1,6 @@
 ---
 title: "BBD Metagenome: Gene Annotation"
-author: "Your Name"
+author: "Bryce Mazloum"
 date: "`r Sys.Date()`"
 output:
   github_document:
@@ -17,9 +17,43 @@ knitr::opts_hooks$set(engine = function(options) {
 })
 ```
 
-<!--
-Explain what this step does and why, and copy each command you ran into a
-bash chunk. R chunks run from the top of the repository.
--->
+```{bash}
+cd ~/bbd-metagenome/prokka
+
+cat ../checkm/bbd_topbins.txt
+
+bin=metabat.3
+prokka --cpus 2 --outdir $bin --prefix $bin  ../metabat/bins_bbd/${bin}.fa
+
+ls metabat.3
+
+#!/bin/bash
+#SBATCH --time=90
+#SBATCH --cpus-per-task=2 --mem=2gb
+
+echo "Starting prokka in $(pwd) at $(date)"
+
+shopt -s expand_aliases
+alias prokka='apptainer run -B /pvol/:/pvol /pvol/data/sif/prokka.sif prokka'
+
+while read bin;do 
+  prokka --cpus 2 --outdir $bin --prefix $bin "../metabat/bins_bbd/${bin}.fa";
+done < ../checkm/bbd_topbins.txt
+
+echo "Finished prokka in $(pwd) at $(date)"
+# prokka shell code
+
+sbatch run_prokka.sh
+
+```
+
+change folder to prokka
+
+choose metabat.3
+
+use prokka to annotate metagenome
+
+use prokka to anotate rest of metagenomes
+~~~
 
 Gene prediction and annotation of the most complete bins with Prokka. Commands for this step were run in `prokka/`.
